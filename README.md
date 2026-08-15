@@ -6,7 +6,7 @@
 - 影片：《奥德赛》（猫眼影片 ID `1545360`）
 - 日期：2026-08-21
 - 检查频率：每 10 分钟
-- 通知：SMTP 邮件；可选 PushPlus 微信推送
+- 通知：PushPlus 微信公众号推送；SMTP 邮件默认关闭
 
 项目不依赖本地电脑持续开机。它会合并多个来源的结果，在首次出现可售场次或后来新增场次时通知一次。相同场次不会重复通知。
 
@@ -36,7 +36,7 @@ movie-ticket-watcher/
 │   │   └── base.py
 │   └── notifiers/
 │       ├── email.py               # SMTP SSL / STARTTLS 邮件
-│       ├── pushplus.py            # 可选的微信推送
+│       ├── pushplus.py            # 当前启用的微信推送
 │       └── base.py
 ├── runtime/state.json             # 已通知场次；Actions 会自动提交这个文件
 ├── tests/                         # JSON/HTML 解析和去重测试
@@ -63,7 +63,7 @@ python -m movie_watcher.cli --dry-run --verbose
 
 `--dry-run` 会访问真实数据源，但不发送通知，也不写入已通知场次。当前没有 8 月 21 日可售场次时，日志中应看到 `no new sellable sessions`。
 
-### 本地测试邮件
+### 本地测试邮件（可选，当前部署未启用）
 
 复制 `.env.example` 中的变量到当前 shell（不要把真实密码写进仓库），然后运行：
 
@@ -105,20 +105,15 @@ git push -u origin main
 
 如果这是已有仓库，只需正常提交并推送这些文件，不要再次运行 `git init`。
 
-### 2. 添加邮件 Secrets
+### 2. 添加微信 Secret
 
-打开仓库：`Settings` → `Secrets and variables` → `Actions` → `New repository secret`，添加：
+先登录 [PushPlus](https://www.pushplus.plus/)，用接收提醒的微信关注并绑定其公众号，取得 token。再打开仓库：`Settings` → `Secrets and variables` → `Actions` → `New repository secret`，添加：
 
 | Secret | 内容 |
 |---|---|
-| `SMTP_HOST` | 例如 `smtp.qq.com` |
-| `SMTP_PORT` | 例如 `465` |
-| `SMTP_USERNAME` | 发件邮箱账号 |
-| `SMTP_PASSWORD` | SMTP 授权码/应用密码 |
-| `SMTP_FROM` | 发件地址，通常同账号 |
-| `SMTP_TO` | 收件地址；多个地址用英文逗号分隔 |
+| `PUSHPLUS_TOKEN` | PushPlus 个人中心显示的 token |
 
-Secrets 不会写进代码或状态文件。不要把 `.env`、邮箱密码或 PushPlus token 提交到仓库。
+Secret 不会写进代码或状态文件。不要把 PushPlus token 提交到仓库或发到聊天中。
 
 ### 3. 手动测试一次
 
@@ -126,7 +121,7 @@ Secrets 不会写进代码或状态文件。不要把 `.env`、邮箱密码或 P
 
 1. 首次选择 `dry_run = true`、`test_notification = false`，确认数据源日志正常。
 2. 再选择 `dry_run = false`、`test_notification = true`，它会跳过票源检查并发送一条明确标注为测试的通知。
-3. 测试成功后，手动运行一次两个开关都为 `false` 的正常检查。如果当前没有票，它不会发信，这是正常的。
+3. 测试成功后，手动运行一次两个开关都为 `false` 的正常检查。如果当前没有票，它不会推送，这是正常的。
 
 之后工作流会在每小时的第 3、13、23、33、43、53 分钟自动运行。GitHub 的 cron 不是实时系统，平台繁忙时可能延迟或极少数丢弃；工作流特意避开整点和半点来降低延迟风险。
 
@@ -138,15 +133,15 @@ Secrets 不会写进代码或状态文件。不要把 `.env`、邮箱密码或 P
 
 工作流也声明了 `contents: write`。如果默认分支保护规则禁止机器人直接 push，需要给 `github-actions[bot]` 放行，或为这个小型监测仓库取消该分支的 push 限制。
 
-## 三、可选微信通知
+## 三、微信通知说明
 
-项目使用 PushPlus 的免费微信公众号渠道：
+当前生产配置只使用 PushPlus 的免费微信公众号渠道：
 
 1. 登录 [PushPlus](https://www.pushplus.plus/)，关注并绑定其微信公众号，取得 token。
 2. 在 GitHub Actions Secrets 添加 `PUSHPLUS_TOKEN`。
-3. 把 `config.yaml` 中 `notifications.pushplus.enabled` 改成 `true` 后提交。
+3. `config.yaml` 已启用 PushPlus，无需再改代码。
 
-邮件和微信都启用时会尝试同时发送。只要至少一个渠道成功，场次就会记入去重状态；失败渠道会在日志中明确记录。若你希望“两个渠道必须都成功才算通知成功”，可调整 `service.py` 的 `notify` 策略。
+只有微信推送成功后，场次才会记入去重状态。若推送临时失败，下一次检查会继续尝试，不会吞掉提醒。
 
 ## 去重和状态变化规则
 
