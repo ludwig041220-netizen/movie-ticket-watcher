@@ -1,0 +1,45 @@
+# 修改 target 即可复用到其他影院、影片和日期。
+target:
+  id: unique-target-id
+  cinema_name: "影院全名"
+  cinema_id: "猫眼影院 ID"
+  movie_name: "影片名"
+  movie_id: "猫眼影片 ID"
+  date: "2026-08-21"
+  timezone: "Asia/Shanghai"
+  buy_url: "https://www.maoyan.com/cinema/CINEMA_ID?movieId=MOVIE_ID"
+
+sources:
+  - name: maoyan_json
+    type: maoyan_json
+    enabled: true
+    endpoint: "https://i.maoyan.com/ajax/cinemaDetail"
+    sellable_ticket_statuses: [0]
+  - name: maoyan_html_fallback
+    type: maoyan_html
+    enabled: true
+    url: "https://www.maoyan.com/cinema/CINEMA_ID?movieId=MOVIE_ID"
+
+notifications:
+  email:
+    enabled: true
+    host_env: SMTP_HOST
+    port_env: SMTP_PORT
+    username_env: SMTP_USERNAME
+    password_env: SMTP_PASSWORD
+    from_env: SMTP_FROM
+    to_env: SMTP_TO
+    use_ssl: true
+    use_starttls: false
+  pushplus:
+    enabled: false
+    token_env: PUSHPLUS_TOKEN
+    endpoint: "https://www.pushplus.plus/send"
+
+runtime:
+  request_timeout_seconds: 20
+  retries: 3
+  retry_backoff_factor: 1.0
+  stop_after_target_days: 1
+  heartbeat_days: 30
+

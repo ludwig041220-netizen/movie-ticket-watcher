@@ -1,0 +1,10 @@
+[project]
+name = "movie-ticket-watcher"
+version = "1.0.0"
+description = "Monitor cinema showtimes and send one-time ticket alerts"
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+

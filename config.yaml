@@ -1,0 +1,49 @@
+target:
+  id: odyssey-qiantan-2026-08-21
+  cinema_name: "MOViE MOViE 影城（前滩太古里店）"
+  cinema_id: "37534"
+  movie_name: "奥德赛"
+  movie_id: "1545360"
+  date: "2026-08-21"
+  timezone: "Asia/Shanghai"
+  buy_url: "https://www.maoyan.com/cinema/37534?movieId=1545360"
+
+sources:
+  # 主源：猫眼移动站的公开结构化影院数据，速度快、无需浏览器。
+  - name: maoyan_json
+    type: maoyan_json
+    enabled: true
+    endpoint: "https://i.maoyan.com/ajax/cinemaDetail"
+    sellable_ticket_statuses: [0]
+
+  # 备用：猫眼影院公开 HTML；仅在页面中明确出现目标日期和“选座购票”时命中。
+  - name: maoyan_html_fallback
+    type: maoyan_html
+    enabled: true
+    url: "https://www.maoyan.com/cinema/37534?movieId=1545360"
+
+notifications:
+  email:
+    enabled: true
+    host_env: SMTP_HOST
+    port_env: SMTP_PORT
+    username_env: SMTP_USERNAME
+    password_env: SMTP_PASSWORD
+    from_env: SMTP_FROM
+    to_env: SMTP_TO
+    use_ssl: true
+    use_starttls: false
+
+  # 可选微信推送：关注 PushPlus 公众号、获取 token 后，设为 true 并添加 Secret。
+  pushplus:
+    enabled: false
+    token_env: PUSHPLUS_TOKEN
+    endpoint: "https://www.pushplus.plus/send"
+
+runtime:
+  request_timeout_seconds: 20
+  retries: 3
+  retry_backoff_factor: 1.0
+  stop_after_target_days: 1
+  heartbeat_days: 30
+
