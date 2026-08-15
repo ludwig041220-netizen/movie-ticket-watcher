@@ -24,7 +24,7 @@ sources:
 
 notifications:
   email:
-    enabled: true
+    enabled: false
     host_env: SMTP_HOST
     port_env: SMTP_PORT
     username_env: SMTP_USERNAME
@@ -34,9 +34,9 @@ notifications:
     use_ssl: true
     use_starttls: false
 
-  # 可选微信推送：关注 PushPlus 公众号、获取 token 后，设为 true 并添加 Secret。
+  # 当前通知渠道：关注 PushPlus 公众号、获取 token 后添加为 GitHub Secret。
   pushplus:
-    enabled: false
+    enabled: true
     token_env: PUSHPLUS_TOKEN
     endpoint: "https://www.pushplus.plus/send"
 
@@ -46,4 +46,3 @@ runtime:
   retry_backoff_factor: 1.0
   stop_after_target_days: 1
   heartbeat_days: 30
-
