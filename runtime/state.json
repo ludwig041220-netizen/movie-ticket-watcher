@@ -1,8 +1,18 @@
 {
   "version": 1,
-  "targets": {},
+  "targets": {
+    "odyssey-qiantan-2026-08-21": {
+      "notified_session_ids": [
+        "0455313ece27b895589f055a",
+        "1da782b02b5a4c4771e6b69d",
+        "f487e58fe2ee7b8da5513f56",
+        "fe0ffbd8691438583a290643",
+        "ff0b1b1dc62b9eec7fb9fdf9"
+      ],
+      "last_notified_at": "2026-08-17T16:04:57.745028+08:00"
+    }
+  },
   "meta": {
     "last_heartbeat": "2026-08-15T00:00:00+08:00"
   }
 }
-
